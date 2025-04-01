@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import os
 
 app = Flask(__name__)
 
@@ -16,12 +15,10 @@ def webhook():
     if not mensaje_usuario:
         return jsonify({"error": "Mensaje vacío"}), 400
 
-    # 🔧 Simulación sin conexión a OpenAI
+    # Simulación sin conexión a OpenAI
     respuesta_falsa = f"Recibí tu mensaje: {mensaje_usuario}"
 
     return jsonify({
         "text": respuesta_falsa,
         "to": numero_cliente
     })
-
-# Ya no necesitas app.run() porque gunicorn lo manejará
