@@ -1,16 +1,11 @@
 from flask import Flask, request, jsonify
-import openai
 import os
 
 app = Flask(__name__)
 
-# Cargar configuración desde variables de entorno
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-ASSISTANT_ID = os.getenv("ASSISTANT_ID")
-
 @app.route("/", methods=["GET"])
 def home():
-    return "Webhook funcionando"
+    return "Webhook funcionando correctamente (modo prueba)"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -19,30 +14,15 @@ def webhook():
     numero_cliente = data.get("message", {}).get("from", "")
 
     if not mensaje_usuario:
-        return jsonify({"error": "No se encontró texto"}), 400
+        return jsonify({"error": "Mensaje vacío"}), 400
 
-    try:
-        openai.api_key = OPENAI_API_KEY
+    # 🔧 Simulación sin conexión a OpenAI
+    respuesta_falsa = f"Recibí tu mensaje: {mensaje_usuario}"
 
-        # Usamos la API de OpenAI con el modelo GPT-4o mini
-        respuesta = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Responde como un asistente profesional y amable."},
-                {"role": "user", "content": mensaje_usuario}
-            ]
-        )
-
-        mensaje_respuesta = respuesta["choices"][0]["message"]["content"]
-
-        return jsonify({
-            "text": mensaje_respuesta,
-            "to": numero_cliente
-        })
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({
+        "text": respuesta_falsa,
+        "to": numero_cliente
+    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
